@@ -1,0 +1,53 @@
+name: Gradle Build
+
+# Déclencheur du workflow
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+# Configuration des jobs
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout du code
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Configuration de JDK 21
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'adopt'
+          java-version: '17'
+
+      # Cache Gradle
+      - name: Cache Gradle packages
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle
+
+      # Exécution des tests
+      - name: Run tests with Gradle
+        run: ./gradlew test
+
+      # Construction du fichier JAR
+      - name: Build the JAR
+        run: ./gradlew build
+
+      # Archive du build
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: HoppipotameDiscordBot
+          path: build/libs/*.jar
