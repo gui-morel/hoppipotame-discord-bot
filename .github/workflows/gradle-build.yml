@@ -1,4 +1,4 @@
-name: Gradle Build
+name: Gradle Build & Test
 
 # Déclencheur du workflow
 on:
